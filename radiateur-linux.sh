@@ -14,17 +14,10 @@ echo "    \\ [-i <input debian iso>] [-b <build dir>]"
 echo ""
 echo "mandatory arguments:"
 echo "  -a <arch>: the architecture (currently: $SUPPORTED_ARCH)"
-echo "  -c <config file>: the genautoo configuration file"
 echo "  -o <output iso>: the name of the generated iso"
 echo ""
 echo "optional arguments:"
-echo "  -p <dir with some .deb>: a directory with .deb to add to the iso"
-echo "       could be usefull if you have trouble with some hardware (non-free firmware)"
-echo "  -d <dir to include in the iso>: a directory with some content to add to the iso"
-echo "       the content of the dir will be included at the / of the new iso"
-echo "       could be used to put some files (ex: config) via [*_nochroot] sections"
 echo "  -D: adds the generation date"
-echo "  -I <installer dir>: path to the installer directory"
 echo "  -i <input debian iso>: path to the basic debian install iso"
 echo "  -b <build dir>: directory used for the build" 
 echo ""
@@ -123,7 +116,7 @@ get_base_iso(){
 
     if [ -z $INPUT_ISO ]
     then
-        ISO_NAME=`curl $BASE_URL |grep businesscard.iso|sed "s/.*<a\ href=\"//"|sed "s/\".*//"`
+        ISO_NAME=`curl $BASE_URL |grep netinst.iso|sed "s/.*<a\ href=\"//"|sed "s/\".*//"`
 
         if ! [ -f $ISO_NAME ]
         then
@@ -227,7 +220,7 @@ build_new_iso(){
 }
 
 test_mandatory_args(){
-if [ -z "$GENTOO_ARCH" ] || [ -z "$CONFIGURATION_FILE" ] || [ -z "$OUT_ISO" ]
+if [ -z "$GENTOO_ARCH" ] || [ -z "$OUT_ISO" ]
 then
     common_print_message "missing arguments: -a -c and -o are mandatory"
     help
@@ -248,12 +241,6 @@ then
     help
 fi
 
-if ! [ -f $CONFIGURATION_FILE ]
-then
-    common_print_message "-c: $CONFIGURATION_FILE doesn't exist"
-    help
-fi
-
 if  [ -f $OUT_ISO ]
 then
     common_print_message "-o: $OUT_ISO already exists"
@@ -271,12 +258,6 @@ test_optionnal_args(){
     if  ! [ -z "$PACKAGES_DIR" ] && ! [ -d "$PACKAGES_DIR" ]
     then
         common_print_message "-p: $PACKAGES_DIR doesn't exist"
-        help
-    fi
-
-    if  ! [ -d $INSTALLER_DIR ]
-    then
-        common_print_message "-I: $INSTALLER_DIR doesn't exist"
         help
     fi
 
