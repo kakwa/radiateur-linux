@@ -143,7 +143,7 @@ extract_initrd(){
     #function extracting the content of the iso initrd for later modification
     #it also put the pool directory (containing the packages) in the extract directory
     common_print_message "extracting the content of the initrd"
-    tmp_new_initrd_dir_PATH=`find $tmp_new_iso_dir -name "initrd.gz"|grep -v gtk`
+    tmp_new_initrd_dir_PATH=`find $tmp_new_iso_dir -name "initrd.gz"|grep -v gtk|grep -v xen|head -n 1`
     mv $tmp_new_initrd_dir_PATH $tmp_garbage_dir
     cd $tmp_garbage_dir 
     gunzip initrd.gz
@@ -190,7 +190,12 @@ create_new_initrd(){
     find . | cpio --create --format='newc' >$tmp_garbage_dir/initrd
     gzip $tmp_garbage_dir/initrd
     cd -
-    mv $tmp_garbage_dir/initrd.gz $tmp_new_initrd_dir_PATH
+    rm -rf `dirname $tmp_new_initrd_dir_PATH/*.gz`
+    rm -rf `dirname $tmp_new_initrd_dir_PATH/xen/*.gz`
+    rm -rf `dirname $tmp_new_initrd_dir_PATH/gtk/*.gz`
+    cp $tmp_garbage_dir/initrd.gz $tmp_new_initrd_dir_PATH
+    cp $tmp_garbage_dir/initrd.gz `dirname $tmp_new_initrd_dir_PATH`/xen/
+    mv $tmp_garbage_dir/initrd.gz `dirname $tmp_new_initrd_dir_PATH`/gtk/
 }
 
 
